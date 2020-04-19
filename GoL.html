@@ -2,7 +2,7 @@
 <html>
 <body>
 
-<canvas id="myCanvas" width="700" height="700"
+<canvas id="myCanvas" width="300" height="300"
 	style="border:1px solid #c3c3c3;">
 	Your browser does not support the canvas element.
 </canvas>
@@ -12,10 +12,10 @@
 	var canvas = document.getElementById("myCanvas");
 	var ctx = canvas.getContext("2d");
 	ctx.fillStyle = "#e6ffe6";
-	ctx.fillRect(0,0,700,700);
+	ctx.fillRect(0,0,300,300);
 
 	var matrix = [];
-	var n = 71;
+	var n = 31;
 	var afast = 10;
 	var r = 5;
 
@@ -51,7 +51,6 @@
 		}
 	}
 
-	var dim = 71;
 	var ger0 = GeraMatriz(n, 0);
 
 
@@ -97,8 +96,7 @@
         //Recebe uma matriz e retorna a matriz soma (8 células vizinhas, se existirem) a partir da matriz de estado
         function GeraSoma(mat)
         {
-			dim = mat.length;
-            soma = GeraMatriz(dim, 1);
+            soma = GeraMatriz(n, 1);
 
             for (var i = 0; i < mat.length; i++)
             {
