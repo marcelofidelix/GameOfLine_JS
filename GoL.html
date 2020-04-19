@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="700" height="700"
+	style="border:1px solid #c3c3c3;">
+	Your browser does not support the canvas element.
+</canvas>
+
+<script>
+
+	var canvas = document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+	ctx.fillStyle = "#e6ffe6";
+	ctx.fillRect(0,0,700,700);
+
+	var matrix = [];
+	var n = 71;
+	var afast = 10;
+	var r = 5;
+
+	//Função sleep
+	function sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	//Função que roda a simulação
+	async function Simu() {
+		mat = GeraMatriz(n, 0)
+		for (let i = 1; i <5000 ; i++) {
+			await sleep(150);
+			mat = Atualiza(mat);
+			GeraCanvas(mat);
+		}
+	}
+
+	Simu();
+
+	//Transforma matriz de 0 e 1 em canvas
+	function GeraCanvas(mat){
+		for(var i=0; i<mat.length; i++) {
+			matrix[i] = [];
+			for(var j=0; j<mat[0].length; j++) {
+				//ctx.clearRect(afast*i, afast*j, canvas.width, canvas.height);
+				if (mat[i][j] == 1){
+					matrix[i][j] = geraCirculoP(afast*i, afast*j, r, ctx);
+				} else {
+					matrix[i][j] = geraCirculoV(afast*i, afast*j, r, ctx);
+				}
+			}
+		}
+	}
+
+	var dim = 71;
+	var ger0 = GeraMatriz(n, 0);
+
+
+
+	//Gera 0 ou 1
+	function Get0ou1()
+	{
+		return Math.floor(Math.random() * 2);
+	}
+	
+        //Retorna uma matriz nxn de 0 u 1
+        function GeraMatriz(n, op)
+        {
+			var m = [];
+			for(var i=0; i<n; i++) {
+				m[i] = [];
+				for(var j=0; j<n; j++) {
+					//Gera matriz de 0 ou 1
+					if (op == 0) {
+						m[i][j] = Get0ou1();
+					} else {
+						//Gera matriz de 0
+						m[i][j] = 0;
+					}
+					
+				}
+			}
+			return m;
+		}
+		
+		//Verifica se o elemento com índices i e j pertencem à matriz mat
+        function PertenceMatriz(i, j, mat)
+        {
+            if (i < 0 || j < 0 || i >= mat.length || j >= mat[0].length)
+            {
+                return false;
+            } else
+            {
+                return true;
+            }
+        }
+
+        //Recebe uma matriz e retorna a matriz soma (8 células vizinhas, se existirem) a partir da matriz de estado
+        function GeraSoma(mat)
+        {
+			dim = mat.length;
+            soma = GeraMatriz(dim, 1);
+
+            for (var i = 0; i < mat.length; i++)
+            {
+                for (var j = 0; j < mat[0].length; j++)
+                {
+                    if (PertenceMatriz(i - 1, j - 1, mat))
+                    {
+                        soma[i][j] += mat[i - 1][j - 1];
+                    }
+                    if (PertenceMatriz(i - 1, j, mat))
+                    {
+                        soma[i][j] += mat[i - 1][j];
+                    }
+                    if (PertenceMatriz(i - 1, j + 1, mat))
+                    {
+                        soma[i][j] += mat[i - 1][j + 1];
+                    }
+                    if (PertenceMatriz(i, j - 1, mat))
+                    {
+                        soma[i][j] += mat[i][j - 1];
+                    }
+                    if (PertenceMatriz(i, j + 1, mat))
+                    {
+                        soma[i][j] += mat[i][j + 1];
+                    }
+                    if (PertenceMatriz(i + 1, j - 1, mat))
+                    {
+                        soma[i][j] += mat[i + 1][j - 1];
+                    }
+                    if (PertenceMatriz(i + 1, j, mat))
+                    {
+                        soma[i][j] += mat[i + 1][j];
+                    }
+                    if (PertenceMatriz(i + 1, j + 1, mat))
+                    {
+                        soma[i][j] += mat[i + 1][j + 1];
+                    }
+                }
+            }
+            return soma;
+        }
+
+        //Recebe uma matriz e retorna a sua atualização
+        function Atualiza(mat)
+        {
+            mat2 = GeraMatriz(mat.length, 1);
+            soma = GeraSoma(mat);
+
+            for (var i = 0; i < mat.length; i++)
+            {
+                for (var j = 0; j < mat[0].length; j++)
+                {
+                    // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+                    if (mat[i][j] == 1 && soma[i][j] < 2)
+                    {
+                        mat2[i][j] = 0;
+                    }
+                    // Any live cell with two or three live neighbours lives on to the next generation.
+                    if (mat[i][j] == 1 && soma[i][j] == 2 || soma[i][j] == 3)
+                    {
+                        mat2[i][j] = 1;
+                    }
+                    // Any live cell with more than three live neighbours dies, as if by overpopulation.
+                    if (mat[i][j] == 1 && soma[i][j] > 3)
+                    {
+                        mat2[i][j] = 0;
+                    }
+                    // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+                    if (mat[i][j] == 0 && soma[i][j] == 3)
+                    {
+                        mat2[i][j] = 1;
+                    }
+                }
+            }
+            return mat2;
+        }
+	
+	function geraCirculoP(coordX, coordY, raio, ctx) {
+		ctx.beginPath();
+		ctx.arc(coordX, coordY, raio, 0, 2 * Math.PI, false);
+		ctx.fillStyle = 'green';
+		ctx.fill();
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = '#003300';
+		ctx.stroke();
+		ctx.closePath();
+	}
+	function geraCirculoV(coordX, coordY, raio, ctx) {
+		ctx.beginPath();
+		ctx.arc(coordX, coordY, raio, 0, 2 * Math.PI, false);
+		ctx.fillStyle = 'white';
+		ctx.fill();
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = '#003300';
+		ctx.stroke();
+		ctx.closePath();
+	}
+
+</script>
+
+</body>
+</html>
